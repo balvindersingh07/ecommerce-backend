@@ -11,7 +11,7 @@ const options = {
     },
     servers: [
       {
-        url: process.env.SWAGGER_SERVER || 'http://localhost:5000', // ✅ Use environment variable
+        url: process.env.BASE_URL || 'http://localhost:5000',
       },
     ],
     components: {
@@ -72,7 +72,7 @@ const options = {
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: ['./routes/*.js'], // ✅ Make sure you’ve got comments in your route files
+  apis: ['./routes/*.js'], // Make sure all route files have Swagger comments
 };
 
 const specs = swaggerJsdoc(options);
