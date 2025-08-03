@@ -5,8 +5,6 @@ This is the backend API for the E-commerce project developed using Node.js, Expr
 ---
 
 ## 🔗 Hosted API
-
-- **Base URL**: [https://ecommerce-backend-usuf.onrender.com](https://ecommerce-backend-usuf.onrender.com)
 - **Swagger Docs**: [https://ecommerce-backend-usuf.onrender.com/api-docs](https://ecommerce-backend-usuf.onrender.com/api-docs)
 
 ---
