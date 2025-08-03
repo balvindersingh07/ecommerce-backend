@@ -1,25 +1,41 @@
 # 🛒 Ecommerce Backend API
 
-This is a RESTful backend API for an ecommerce application built with **Node.js**, **Express**, and **MongoDB**. It supports products, cart, wishlist management, and JWT-based authentication.
+A Node.js + Express REST API for an e-commerce application, with MongoDB and Swagger documentation.
 
 ---
 
-## 🌐 Live Deployment
+## 🚀 Live URL
 
-- **API Base URL:** [`https://ecommerce-backend-usuf.onrender.com`](https://ecommerce-backend-usuf.onrender.com)
-- **Swagger Docs:** [`/api-docs`](https://ecommerce-backend-usuf.onrender.com/api-docs)
-
----
-
-## 🚀 Features
-
-- 📦 Product listing & details
-- 🛒 Add to cart, update quantity
-- ❤️ Add to favorites / wishlist
-- 🔒 JWT authentication
-- 📚 Swagger API documentation
+- **Base API:** https://ecommerce-backend-usuf.onrender.com
+- **Swagger Docs:** https://ecommerce-backend-usuf.onrender.com/api-docs
 
 ---
 
-## 📂 Project Structure
+## 📦 Features
 
+- Product management
+- Cart operations
+- Wishlist/favorites
+- JWT authentication
+- MongoDB (Cloud via Atlas)
+- Swagger API documentation
+
+---
+
+## 🔧 Technologies
+
+- Node.js
+- Express
+- MongoDB + Mongoose
+- Swagger (OpenAPI 3.0)
+- dotenv
+- JWT
+
+---
+
+## 🛠️ Installation
+
+```bash
+git clone https://github.com/<your-username>/ecommerce-backend.git
+cd ecommerce-backend
+npm install
