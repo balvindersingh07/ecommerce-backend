@@ -8,76 +8,102 @@ const {
 } = require('../controllers/wishlistController');
 
 const protect = require('../middleware/authMiddleware');
-const validateWishlistItem = require('../middleware/validateWishlistItem'); // ✅ Middleware added
+const validateWishlistItem = require('../middleware/validateWishlistItem'); // ✅ Middleware
 
 /**
  * @swagger
  * tags:
- *   name: Wishlist
- *   description: Wishlist management
+ *   name: Favorites
+ *   description: Favorites (wishlist) management
  */
 
 /**
  * @swagger
- * /wishlist:
+ * components:
+ *   schemas:
+ *     FavoriteItem:
+ *       type: object
+ *       required: [productId]
+ *       properties:
+ *         productId:
+ *           type: string
+ *           example: "66f0abc1234def5678901234"
+ */
+
+/**
+ * @swagger
+ * /favorites:
  *   post:
- *     summary: Add a product to wishlist
- *     tags: [Wishlist]
- *     security:
- *       - bearerAuth: []
+ *     summary: Add a product to favorites
+ *     tags: [Favorites]
+ *     security: [ { bearerAuth: [] } ]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - productId
- *             properties:
- *               productId:
- *                 type: string
- *                 description: The ID of the product to add
+ *             $ref: '#/components/schemas/FavoriteItem'
  *     responses:
- *       201:
- *         description: Product added to wishlist
- *       400:
- *         description: Invalid input or already exists
- *       401:
- *         description: Unauthorized
- *
+ *       201: { description: Product added to favorites }
+ *       400: { description: Invalid input or already exists }
+ *       401: { description: Unauthorized }
  *   get:
- *     summary: Get all wishlist items for the logged-in user
- *     tags: [Wishlist]
- *     security:
- *       - bearerAuth: []
+ *     summary: Get all favorites for the logged-in user
+ *     tags: [Favorites]
+ *     security: [ { bearerAuth: [] } ]
  *     responses:
- *       200:
- *         description: List of wishlist items
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Server error
+ *       200: { description: List of favorite items }
+ *       401: { description: Unauthorized }
+ *       500: { description: Server error }
  *
- * /wishlist/{id}:
+ * /favorites/{id}:
  *   delete:
- *     summary: Remove a product from wishlist
- *     tags: [Wishlist]
- *     security:
- *       - bearerAuth: []
+ *     summary: Remove a product from favorites
+ *     tags: [Favorites]
+ *     security: [ { bearerAuth: [] } ]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *         description: ID of the product to remove
+ *         schema: { type: string }
+ *         description: Favorite item ID
  *     responses:
- *       200:
- *         description: Product removed from wishlist
- *       404:
- *         description: Product not found in wishlist
- *       401:
- *         description: Unauthorized
+ *       200: { description: Product removed from favorites }
+ *       404: { description: Product not found in favorites }
+ *       401: { description: Unauthorized }
+ *
+ * /api/favorites:
+ *   post:
+ *     summary: Add a product to favorites (alias)
+ *     tags: [Favorites]
+ *     security: [ { bearerAuth: [] } ]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/FavoriteItem'
+ *     responses:
+ *       201: { description: Product added to favorites }
+ *   get:
+ *     summary: Get all favorites (alias)
+ *     tags: [Favorites]
+ *     security: [ { bearerAuth: [] } ]
+ *     responses:
+ *       200: { description: List of favorite items }
+ *
+ * /api/favorites/{id}:
+ *   delete:
+ *     summary: Remove a product from favorites (alias)
+ *     tags: [Favorites]
+ *     security: [ { bearerAuth: [] } ]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Product removed from favorites }
  */
 
 // 🔒 Protected Routes with validation

@@ -10,7 +10,7 @@ const {
 } = require('../controllers/cartController');
 
 // Middlewares
-const protect = require('../middleware/authMiddleware'); // üîê Protect routes
+const protect = require('../middleware/authMiddleware');            // üîê Protect routes
 const validateCartItem = require('../middleware/validateCartItem'); // ‚úÖ For adding item
 const validateCartQuantity = require('../middleware/validateCartQuantity'); // ‚úÖ For updating quantity
 
@@ -34,21 +34,11 @@ const validateCartQuantity = require('../middleware/validateCartQuantity'); // ‚
  *         - category
  *         - quantity
  *       properties:
- *         name:
- *           type: string
- *           example: iPhone 13
- *         price:
- *           type: number
- *           example: 999.99
- *         image:
- *           type: string
- *           example: https://example.com/image.jpg
- *         category:
- *           type: string
- *           example: electronics
- *         quantity:
- *           type: number
- *           example: 1
+ *         name:     { type: string,  example: "iPhone 13" }
+ *         price:    { type: number,  example: 999.99 }
+ *         image:    { type: string,  example: "https://example.com/image.jpg" }
+ *         category: { type: string,  example: "electronics" }
+ *         quantity: { type: number,  example: 1 }
  */
 
 /**
@@ -57,27 +47,20 @@ const validateCartQuantity = require('../middleware/validateCartQuantity'); // ‚
  *   post:
  *     summary: Add product to cart
  *     tags: [Cart]
- *     security:
- *       - bearerAuth: []
+ *     security: [ { bearerAuth: [] } ]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CartItem'
+ *           schema: { $ref: '#/components/schemas/CartItem' }
  *     responses:
- *       201:
- *         description: Product added to cart
- *       400:
- *         description: Missing required fields
- *       500:
- *         description: Server error
- *
+ *       201: { description: Product added to cart }
+ *       400: { description: Missing required fields }
+ *       500: { description: Server error }
  *   get:
  *     summary: Get all cart items for the logged-in user
  *     tags: [Cart]
- *     security:
- *       - bearerAuth: []
+ *     security: [ { bearerAuth: [] } ]
  *     responses:
  *       200:
  *         description: List of items in the cart
@@ -85,46 +68,33 @@ const validateCartQuantity = require('../middleware/validateCartQuantity'); // ‚
  *           application/json:
  *             schema:
  *               type: array
- *               items:
- *                 $ref: '#/components/schemas/CartItem'
- *       500:
- *         description: Server error
- */
-
-/**
- * @swagger
+ *               items: { $ref: '#/components/schemas/CartItem' }
+ *       500: { description: Server error }
+ *
  * /cart/{id}:
  *   delete:
  *     summary: Remove item from cart
  *     tags: [Cart]
- *     security:
- *       - bearerAuth: []
+ *     security: [ { bearerAuth: [] } ]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
+ *         schema: { type: string }
  *         description: Cart item ID
  *     responses:
- *       200:
- *         description: Item removed
- *       404:
- *         description: Item not found
- *       500:
- *         description: Server error
- *
+ *       200: { description: Item removed }
+ *       404: { description: Item not found }
+ *       500: { description: Server error }
  *   put:
  *     summary: Update quantity of cart item
  *     tags: [Cart]
- *     security:
- *       - bearerAuth: []
+ *     security: [ { bearerAuth: [] } ]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
+ *         schema: { type: string }
  *         description: Cart item ID
  *     requestBody:
  *       required: true
@@ -133,18 +103,64 @@ const validateCartQuantity = require('../middleware/validateCartQuantity'); // ‚
  *           schema:
  *             type: object
  *             properties:
- *               quantity:
- *                 type: number
- *                 example: 2
+ *               quantity: { type: number, example: 2 }
+ *     responses:
+ *       200: { description: Quantity updated }
+ *       400: { description: Invalid input }
+ *       404: { description: Item not found }
+ *       500: { description: Server error }
+ *
+ * /api/cart:
+ *   post:
+ *     summary: Add product to cart (alias)
+ *     tags: [Cart]
+ *     security: [ { bearerAuth: [] } ]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { $ref: '#/components/schemas/CartItem' }
+ *     responses:
+ *       201: { description: Product added to cart }
+ *   get:
+ *     summary: Get all cart items (alias)
+ *     tags: [Cart]
+ *     security: [ { bearerAuth: [] } ]
  *     responses:
  *       200:
- *         description: Quantity updated
- *       400:
- *         description: Invalid input
- *       404:
- *         description: Item not found
- *       500:
- *         description: Server error
+ *         description: List of items in the cart
+ *
+ * /api/cart/{id}:
+ *   delete:
+ *     summary: Remove item from cart (alias)
+ *     tags: [Cart]
+ *     security: [ { bearerAuth: [] } ]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Item removed }
+ *   put:
+ *     summary: Update quantity of cart item (alias)
+ *     tags: [Cart]
+ *     security: [ { bearerAuth: [] } ]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               quantity: { type: number, example: 2 }
+ *     responses:
+ *       200: { description: Quantity updated }
  */
 
 // ‚úÖ Routes

@@ -1,17 +1,30 @@
 {
   "name": "ecommerce-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Ecommerce backend (Node.js, Express, MongoDB) with Swagger docs",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "seed": "node scripts/seed.js",
+    "drop": "node scripts/drop.js"
   },
-  "keywords": [],
+  "keywords": [
+    "ecommerce",
+    "express",
+    "mongodb",
+    "swagger",
+    "backend"
+  ],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
@@ -19,12 +32,16 @@
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.19.0",
     "mongoose": "^8.16.4",
     "morgan": "^1.10.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "jest": "^30.1.3",
+    "mongodb-memory-server": "^10.2.0",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.4"
   }
 }
