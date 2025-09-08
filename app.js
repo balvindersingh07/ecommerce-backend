@@ -3,45 +3,48 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 
-const authRoutes = require('./routes/authRoutes');            // ✅ NEW: Auth routes
+const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
 
-// If "swaggerDocs is not a function" again, use './swagger.js'
 const swaggerDocs = require('./swagger');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// Global middlewares
+// Core middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: process.env.CORS_ORIGIN || '*'}));
 app.use(morgan('dev'));
 
-// Swagger UI
+// --- Swagger UI (KEEP BEFORE routes/catch-all) ---
 swaggerDocs(app);
 
+// API prefix (changeable by env)
+const API_PREFIX = process.env.API_PREFIX || '/api/v1';
+
 // Health
-app.get('/', (req, res) => {
-  res.status(200).send('✅ API is working!');
-});
+app.get('/', (_req, res) => res.status(200).send('✅ API is working!'));
 
-// Auth
-app.use('/auth', authRoutes);                                 // ✅ NEW
+// ---- Versioned API routes ----
+app.use(`${API_PREFIX}/auth`, authRoutes);
+app.use(`${API_PREFIX}/products`, productRoutes);
+app.use(`${API_PREFIX}/cart`, cartRoutes);
+app.use(`${API_PREFIX}/favorites`, wishlistRoutes);
 
-// Products
+// (Optional) Backward-compatible unprefixed routes
+app.use('/auth', authRoutes);
 app.use('/products', productRoutes);
-
-// Cart & Favorites
 app.use('/cart', cartRoutes);
 app.use('/favorites', wishlistRoutes);
 
-// Guideline-compliant aliases
-app.use('/api/cart', cartRoutes);
-app.use('/api/favorites', wishlistRoutes);
+// 404 catch-all (last regular middleware)
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: 'Not found' });
+});
 
-// Global error handler
+// Global error handler (very last)
 app.use(errorHandler);
 
 module.exports = app;
