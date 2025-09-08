@@ -12,13 +12,15 @@ const swaggerDocs = require('./swagger');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
+app.set('trust proxy', 1);
 
-app.set('trust proxy', 1); // Render behind proxy
-
-// Core middlewares
+// Global middlewares
 app.use(express.json());
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(morgan('dev'));
+
+// 🔎 tiny debug: show we are on the latest build
+app.get('/__ok', (_req, res) => res.send('ok ' + new Date().toISOString()));
 
 // Health FIRST (pretty)
 app.get('/', (_req, res) =>
@@ -28,29 +30,26 @@ app.get('/', (_req, res) =>
     .send('<h1>✅ Ecommerce API is live</h1><p>Docs: <a href="/api-docs">/api-docs</a></p>')
 );
 
-// Swagger SECOND (must be before routes/catch-all)
+// Swagger SECOND (before any routes/catch-alls)
 swaggerDocs(app);
 
-// API prefix (changeable via env)
+// API prefix
 const API_PREFIX = process.env.API_PREFIX || '/api/v1';
 
-// ---- Versioned API routes ----
+// Versioned API routes
 app.use(`${API_PREFIX}/auth`, authRoutes);
 app.use(`${API_PREFIX}/products`, productRoutes);
 app.use(`${API_PREFIX}/cart`, cartRoutes);
 app.use(`${API_PREFIX}/favorites`, wishlistRoutes);
 
-// (Optional) Backward-compatible unprefixed routes
-// Comment out these four if you only want /api/v1/*
-app.use('/auth', authRoutes);
-app.use('/products', productRoutes);
-app.use('/cart', cartRoutes);
-app.use('/favorites', wishlistRoutes);
+// ⛔ TEMP: comment these 4 to avoid accidental collisions during debug
+// app.use('/auth', authRoutes);
+// app.use('/products', productRoutes);
+// app.use('/cart', cartRoutes);
+// app.use('/favorites', wishlistRoutes);
 
-// 404 catch-all LAST
-app.use((req, res) => {
-  res.status(404).json({ success: false, message: 'Not found' });
-});
+// 404 LAST
+app.use((req, res) => res.status(404).send('Not Found'));
 
 // Error handler VERY LAST
 app.use(errorHandler);
