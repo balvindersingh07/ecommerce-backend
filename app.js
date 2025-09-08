@@ -20,10 +20,15 @@ app.use(express.json());
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(morgan('dev'));
 
-// Health FIRST
-app.get('/', (_req, res) => res.status(200).send('✅ API is working!'));
+// Health FIRST (pretty)
+app.get('/', (_req, res) =>
+  res
+    .status(200)
+    .type('html')
+    .send('<h1>✅ Ecommerce API is live</h1><p>Docs: <a href="/api-docs">/api-docs</a></p>')
+);
 
-// Swagger SECOND (must be before catch-alls)
+// Swagger SECOND (must be before routes/catch-all)
 swaggerDocs(app);
 
 // API prefix (changeable via env)
@@ -36,7 +41,7 @@ app.use(`${API_PREFIX}/cart`, cartRoutes);
 app.use(`${API_PREFIX}/favorites`, wishlistRoutes);
 
 // (Optional) Backward-compatible unprefixed routes
-// Comment these out if you only want /api/v1/*
+// Comment out these four if you only want /api/v1/*
 app.use('/auth', authRoutes);
 app.use('/products', productRoutes);
 app.use('/cart', cartRoutes);
