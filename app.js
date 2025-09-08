@@ -13,19 +13,21 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
+app.set('trust proxy', 1); // Render behind proxy
+
 // Core middlewares
 app.use(express.json());
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*'}));
+app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(morgan('dev'));
 
-// --- Swagger UI (KEEP BEFORE routes/catch-all) ---
+// Health FIRST
+app.get('/', (_req, res) => res.status(200).send('✅ API is working!'));
+
+// Swagger SECOND (must be before catch-alls)
 swaggerDocs(app);
 
-// API prefix (changeable by env)
+// API prefix (changeable via env)
 const API_PREFIX = process.env.API_PREFIX || '/api/v1';
-
-// Health
-app.get('/', (_req, res) => res.status(200).send('✅ API is working!'));
 
 // ---- Versioned API routes ----
 app.use(`${API_PREFIX}/auth`, authRoutes);
@@ -34,17 +36,18 @@ app.use(`${API_PREFIX}/cart`, cartRoutes);
 app.use(`${API_PREFIX}/favorites`, wishlistRoutes);
 
 // (Optional) Backward-compatible unprefixed routes
+// Comment these out if you only want /api/v1/*
 app.use('/auth', authRoutes);
 app.use('/products', productRoutes);
 app.use('/cart', cartRoutes);
 app.use('/favorites', wishlistRoutes);
 
-// 404 catch-all (last regular middleware)
+// 404 catch-all LAST
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Not found' });
 });
 
-// Global error handler (very last)
+// Error handler VERY LAST
 app.use(errorHandler);
 
 module.exports = app;
