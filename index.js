@@ -1,17 +1,21 @@
 // index.js
 const path = require('path');
 
-// Load env FIRST and override any stale process vars
-require('dotenv').config({
-  path: path.resolve(__dirname, '.env'),
-  override: true,
-});
+// .env sirf dev/test mein load karo; prod (Render) pe env dashboard se aayega
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+  console.log('🧪 Loaded local .env');
+}
 
 const app = require('./app');
 const connectDB = require('./connect');
 
-const PORT = Number(process.env.PORT) || 3000;
-const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+const PORT = parseInt(process.env.PORT, 10) || 10000;
+const HOST = '0.0.0.0';
+const PUBLIC_URL =
+  process.env.BASE_URL ||
+  process.env.RENDER_EXTERNAL_URL || // if Render provides it
+  `http://localhost:${PORT}`;
 
 // Mask credentials for safe logging
 const maskUri = (uri = '') =>
@@ -19,18 +23,17 @@ const maskUri = (uri = '') =>
 
 (async () => {
   try {
-    if (!process.env.MONGO_URI) {
-      throw new Error('MONGO_URI is not set. Check your .env file.');
-    }
+    const { MONGO_URI } = process.env;
+    if (!MONGO_URI) throw new Error('MONGO_URI is not set.');
 
-    console.log('→ Using MONGO_URI:', maskUri(process.env.MONGO_URI));
+    console.log('→ Using MONGO_URI:', maskUri(MONGO_URI));
 
-    // Connect to MongoDB (uses MONGO_URI inside connect.js)
+    // Connect to MongoDB (connect.js should read process.env.MONGO_URI)
     await connectDB();
 
-    const server = app.listen(PORT, () => {
-      console.log(`🚀 Server running at ${BASE_URL}`);
-      console.log(`📚 Swagger docs at ${BASE_URL}/api-docs`);
+    const server = app.listen(PORT, HOST, () => {
+      console.log(`🚀 Server running at ${PUBLIC_URL}`);
+      console.log(`📚 Swagger docs at ${PUBLIC_URL}/api-docs`);
     });
 
     // Graceful shutdown
@@ -54,7 +57,7 @@ const maskUri = (uri = '') =>
       process.exit(1);
     });
   } catch (err) {
-    console.error('❌ Failed to connect to MongoDB:', err);
+    console.error('❌ Startup error:', err);
     process.exit(1);
   }
 })();
