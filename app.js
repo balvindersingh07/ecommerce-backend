@@ -19,13 +19,15 @@ app.use(express.json());
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(morgan('dev'));
 
-// Debug routes (deploy verify)
-app.get('/__ok', (_req, res) => res.send('ok ' + new Date().toISOString()));
-app.get('/__build', (_req, res) =>
-  res.json({ sha: process.env.RENDER_GIT_COMMIT || 'n/a', startedAt: new Date().toISOString() })
-);
+// (optional) debug routes – only in dev
+if (process.env.NODE_ENV !== 'production') {
+  app.get('/__ok', (_req, res) => res.send('ok ' + new Date().toISOString()));
+  app.get('/__build', (_req, res) =>
+    res.json({ sha: process.env.RENDER_GIT_COMMIT || 'n/a', startedAt: new Date().toISOString() })
+  );
+}
 
-// Health (nice landing)
+// Health (pretty)
 app.get('/', (_req, res) =>
   res
     .status(200)
@@ -43,7 +45,7 @@ app.use(`${API_PREFIX}/products`, productRoutes);
 app.use(`${API_PREFIX}/cart`, cartRoutes);
 app.use(`${API_PREFIX}/favorites`, wishlistRoutes);
 
-// (Keep these OFF during debug to avoid collisions; enable later if needed)
+// (optional) old aliases — keep OFF to avoid collisions; enable only if needed
 // app.use('/auth', authRoutes);
 // app.use('/products', productRoutes);
 // app.use('/cart', cartRoutes);
