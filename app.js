@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(morgan('dev'));
 
-// (optional) debug routes – only in dev
+// Debug endpoints (dev only)
 if (process.env.NODE_ENV !== 'production') {
   app.get('/__ok', (_req, res) => res.send('ok ' + new Date().toISOString()));
   app.get('/__build', (_req, res) =>
@@ -27,7 +27,7 @@ if (process.env.NODE_ENV !== 'production') {
   );
 }
 
-// Health (pretty)
+// Health
 app.get('/', (_req, res) =>
   res
     .status(200)
@@ -38,18 +38,24 @@ app.get('/', (_req, res) =>
 // Swagger BEFORE routes/catch-alls
 swaggerDocs(app);
 
-// Versioned API
+// -------- API ROUTES --------
 const API_PREFIX = process.env.API_PREFIX || '/api/v1';
+
+// Versioned (recommended)
 app.use(`${API_PREFIX}/auth`, authRoutes);
 app.use(`${API_PREFIX}/products`, productRoutes);
 app.use(`${API_PREFIX}/cart`, cartRoutes);
 app.use(`${API_PREFIX}/favorites`, wishlistRoutes);
 
-// (optional) old aliases — keep OFF to avoid collisions; enable only if needed
-// app.use('/auth', authRoutes);
-// app.use('/products', productRoutes);
-// app.use('/cart', cartRoutes);
-// app.use('/favorites', wishlistRoutes);
+// Teacher-compatibility aliases (ON)
+app.use('/auth', authRoutes);            // optional but harmless
+app.use('/products', productRoutes);     // GET /products, GET /products/:category
+app.use('/cart', cartRoutes);            // GET /cart
+app.use('/favorites', wishlistRoutes);   // GET /favorites
+
+// Per guideline: POST on /api/*
+app.use('/api/cart', cartRoutes);        // POST /api/cart
+app.use('/api/favorites', wishlistRoutes); // POST /api/favorites
 
 // 404 LAST
 app.use((req, res) => res.status(404).json({ success: false, message: 'Not found' }));
