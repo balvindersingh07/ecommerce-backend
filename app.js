@@ -14,15 +14,18 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 app.set('trust proxy', 1);
 
-// Global middlewares
+// Middlewares
 app.use(express.json());
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(morgan('dev'));
 
-// 🔎 tiny debug: show we are on the latest build
+// Debug routes (deploy verify)
 app.get('/__ok', (_req, res) => res.send('ok ' + new Date().toISOString()));
+app.get('/__build', (_req, res) =>
+  res.json({ sha: process.env.RENDER_GIT_COMMIT || 'n/a', startedAt: new Date().toISOString() })
+);
 
-// Health FIRST (pretty)
+// Health (nice landing)
 app.get('/', (_req, res) =>
   res
     .status(200)
@@ -30,26 +33,24 @@ app.get('/', (_req, res) =>
     .send('<h1>✅ Ecommerce API is live</h1><p>Docs: <a href="/api-docs">/api-docs</a></p>')
 );
 
-// Swagger SECOND (before any routes/catch-alls)
+// Swagger BEFORE routes/catch-alls
 swaggerDocs(app);
 
-// API prefix
+// Versioned API
 const API_PREFIX = process.env.API_PREFIX || '/api/v1';
-
-// Versioned API routes
 app.use(`${API_PREFIX}/auth`, authRoutes);
 app.use(`${API_PREFIX}/products`, productRoutes);
 app.use(`${API_PREFIX}/cart`, cartRoutes);
 app.use(`${API_PREFIX}/favorites`, wishlistRoutes);
 
-// ⛔ TEMP: comment these 4 to avoid accidental collisions during debug
+// (Keep these OFF during debug to avoid collisions; enable later if needed)
 // app.use('/auth', authRoutes);
 // app.use('/products', productRoutes);
 // app.use('/cart', cartRoutes);
 // app.use('/favorites', wishlistRoutes);
 
 // 404 LAST
-app.use((req, res) => res.status(404).send('Not Found'));
+app.use((req, res) => res.status(404).json({ success: false, message: 'Not found' }));
 
 // Error handler VERY LAST
 app.use(errorHandler);
