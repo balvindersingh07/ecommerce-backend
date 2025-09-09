@@ -14,20 +14,30 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 app.set('trust proxy', 1);
 
+const SHOW_DEBUG = process.env.EXPOSE_DEBUG_ROUTES === 'true';
+
 // Middlewares
 app.use(express.json());
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(morgan('dev'));
 
-// Debug endpoints (dev only)
-if (process.env.NODE_ENV !== 'production') {
+// Always-on health (prod/dev)
+app.get('/healthz', (_req, res) =>
+  res.status(200).json({ status: 'ok', uptime: process.uptime() })
+);
+
+// Debug endpoints (enabled in dev OR if EXPOSE_DEBUG_ROUTES=true)
+if (SHOW_DEBUG || process.env.NODE_ENV !== 'production') {
   app.get('/__ok', (_req, res) => res.send('ok ' + new Date().toISOString()));
   app.get('/__build', (_req, res) =>
-    res.json({ sha: process.env.RENDER_GIT_COMMIT || 'n/a', startedAt: new Date().toISOString() })
+    res.json({
+      sha: process.env.RENDER_GIT_COMMIT || 'n/a',
+      startedAt: new Date().toISOString(),
+    })
   );
 }
 
-// Health
+// Pretty root
 app.get('/', (_req, res) =>
   res
     .status(200)
@@ -47,13 +57,11 @@ app.use(`${API_PREFIX}/products`, productRoutes);
 app.use(`${API_PREFIX}/cart`, cartRoutes);
 app.use(`${API_PREFIX}/favorites`, wishlistRoutes);
 
-// Teacher-compatibility aliases (ON)
-app.use('/auth', authRoutes);            // optional but harmless
+// Teacher-compatibility aliases
+app.use('/auth', authRoutes);
 app.use('/products', productRoutes);     // GET /products, GET /products/:category
 app.use('/cart', cartRoutes);            // GET /cart
 app.use('/favorites', wishlistRoutes);   // GET /favorites
-
-// Per guideline: POST on /api/*
 app.use('/api/cart', cartRoutes);        // POST /api/cart
 app.use('/api/favorites', wishlistRoutes); // POST /api/favorites
 
